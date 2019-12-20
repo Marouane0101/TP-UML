@@ -1,0 +1,94 @@
+Create [Or replace ] trigger nom_trigger
+{ Before | After } {INSERT | DELETE | UPDATE [ OF List de colonnes ]}
+
+ON table
+
+[FOR EACH ROW]
+
+[WHEN (condition de déclenchement)] // condition 
+
+DECLARE
+
+----
+
+BEGIN
+
+....//Action
+
+-----------------------------
+
+CREATE TRIGGER suppclient
+
+BEFORE DELETE ON CLIENTE 
+
+FOR EACH ROW 
+
+BEGIN
+
+DELETE FROM COMMANDE WHERE CODCLI=:OLD.CODCLI 
+
+END;
+
+/
+
+------------------------------------
+
+CREATE OR REPLACE TRIGGER SUPPRESSION_LIGNE
+
+BEFORE DELETE ON PRODUIT 
+
+FOR EACH ROW
+
+BEGIN
+
+INSing ERT INTO JOURNAL VALUES (:OLD.CODPROD , :OLD.LIBELLE , :OLD.PRIX , :OLD.QTE ) //// CODEPROD --> journale , OLD.CODPROD --> produit
+
+
+---------------------------------------------
+
+CREATE OR REPLACE TRIGGER
+BORNER_AUGMENTPU
+
+BEFORE UPDATE OF PRIX
+
+ON PRODUIT 
+FOR EACH ROW 
+when(New.Prix > Old.Prix *1.1) // QUAND Y A  NEW ET OLD EN MEME TEMPS ? 
+
+BEGIN
+
+:New.Prix:=:Old.Prix*11;
+
+END;
+/
+
+-------------------------------------------------
+
+CREATE TRIGGER tg_nouvVente
+
+AFTER INSERT ON DetailCommande
+
+FOR EACH ROW
+
+BEGIN
+
+Update Produit set qteStock - : NEW.qte
+ where codeP=:New.codeP;
+
+END;
+/
+-------------------------------------------------------
+
+CREATE OR REPLACE TRIGGER LOGADD
+AFTER INSERT ON CLIENTS
+FOR EACH ROW
+
+BEGIN
+
+INSERT INTO LOG_CLIENTS VALUES
+
+(:NEW.NOM,:NEW.ADRESSE,:NEW.REFERENCE,:NEW.NOM_PIECE,:NEW.QUANTITE,:NEW.PRIX,:NEW.ECHEANCE,USER,SYSDATE,'INSERT');
+
+END;
+
+---------------------------------------------------------
